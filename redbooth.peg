@@ -1,0 +1,64 @@
+node            =  line+
+
+line            =  (md_line / words) Newline?
+
+words           =  word+
+
+word            =  emoji
+                 / emoji_native
+                 / md_pre
+                 / md_em
+                 / md_strike
+                 / md_bold
+                 / md_link
+                 / md_image
+                 / Nonspacechar
+                 / Sp
+
+////////////////////////////
+//  Emoji Grammar
+////////////////////////////
+
+emoji           =  ":" named_emoji ":"
+
+named_emoji     =  "smile"
+                 / "trollface"
+                 / "cry"
+                 / "rage"
+                 / "eggplant"
+                 / "clap"
+                 / "+1"
+
+emoji_native    =  "😄" / "😃" / "😀"
+
+////////////////////////////
+//  Pseudo Markdown Grammar
+////////////////////////////
+
+md_line         =  Sp? Sp? Sp? "***" [*]* Sp*
+                 / Sp? Sp? Sp? "---" [\-]* Sp*
+                 / Sp? Sp? Sp? "Sp" [_]* Sp* { return {line: true} }
+
+md_pre          =  "`" [^`]+ "`"
+
+md_em           =  "*" [^*]+ "*"
+
+md_strike       =  "~~" [^~]+ "~~"
+
+md_bold         =  "**" [^*]+ "**"
+
+md_image        =  "!" md_link
+
+md_link         =  "[" title:[^\[\]]* "]" "(" address:[^()\s]+ ")" { return {title: title.join(''), address: address.join('')} }
+
+///////////////////////
+//  General Grammar
+///////////////////////
+
+Nonspacechar    =  (!Spacechar !Newline .)+
+
+Sp              =  Spacechar+
+
+Spacechar       =  " " / "\t"
+
+Newline         =  "\n" / "\r" "\n"?
